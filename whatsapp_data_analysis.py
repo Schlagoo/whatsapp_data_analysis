@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*-
+
 """
     Title:          datahandler.py
     Description:    Collection of fuctions which can be used to analyse
