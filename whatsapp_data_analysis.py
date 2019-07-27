@@ -1,19 +1,20 @@
 #!/usr/bin/python3
 
 """
-    Title:          datahandler.py
+    Title:          whatsapp_data_analysis.py
     Description:    Collection of fuctions which can be used to analyse
                     whatsapp group chats exported as txt-file.
     Author:         Pascal Schlaak
-    Date:           2019-06-30
+    Date:           2019-07-27
     Python:         3.6.7
 """
 
 from matplotlib import pyplot as plt
+from collections import OrderedDict
 
 
-# Path to group chat txt-file. Export instruction see: https://faq.whatsapp.com/de/wp/22548236?lang=en
-path_to_chat_file = "....txt"
+# Path to group chat txt-file. Export instruction see: https://faq.whatsapp.com/wp/22548236
+path_to_chat_file = "/home/.../...txt"
 
 
 def read_data(path_to_chat_file):
@@ -129,16 +130,85 @@ def count_messages_and_words_by_name(chat_messages, name_set, save_plot=0):
     if save_plot == 0:
         plt.show()
     elif save_plot == 1:
-        plt.savefig("number_messages_by_name.png", dpi=300)
+        plt.savefig("number_messages_by_name.png", dpi=400)
         plt.close()
     else:
         print("\nError: Wrong save_plot value! Should be 0 or 1 see help() of function!")
 
 
+def show_activity_by_time(chat_messages, save_plot=0, format=3):
+
+    """
+    Show message activity by time. Caution: Using 24h-format!
+    
+    :param  dict    chat_messages:  Dictionary with messages and their content
+    :param  int     save_plot:      Show plot = 0, save plot as png = 1; Default 0
+    :param  int     format:         Sets activity format: day = 0, hour:minute:second = 1,
+                                    hour:minute = 2, hour = 3; Default 3
+    """
+
+    counter_time = {}
+
+    # Get time from message
+    for message in chat_messages.values():
+        current_time = message["datetime"].split(", ")
+        # Get activity by day
+        if format == 0:
+            current_time = current_time[0]
+            plt.xlabel("Time [day]")
+        # Get activity by hour, minute, second
+        elif format == 1:
+            current_time = current_time[-1]
+            plt.xlabel("Time [hour:minute:second]")
+        # Get activity by hour, minute
+        elif format == 2:
+            current_time = current_time[-1]
+            current_time = current_time[0:5]
+            plt.xlabel("Time [hour:minute]")
+        # Get activity by hour (recommended)
+        elif format == 3:
+            current_time = current_time[-1]
+            current_time = current_time[0:2]
+            plt.xlabel("Time [hour]")
+        else:
+            print("\nError: Wrong time format specified! Should be 0, 1, 2, 3 see help() of function!")
+        # Check if time key already in dict...
+        if current_time in counter_time:
+            counter_time[current_time] += 1
+        # Remove empty values
+        elif current_time == "":
+            continue
+        # ...if not add it
+        else:
+            counter_time[current_time] = 1 
+
+    # Sort dictionary (start time: midnight)
+    ordered_counter_time = OrderedDict(sorted(counter_time.items()))
+    
+    # Plot activity
+    plt.plot(ordered_counter_time.keys(), ordered_counter_time.values())
+    plt.fill_between(ordered_counter_time.keys(), ordered_counter_time.values())
+    plt.title("Total group activity by time")
+    plt.ylabel("Total messages [number]")
+    
+    # Check if plot should be showed or saved
+    if save_plot == 0:
+        plt.show()
+    elif save_plot == 1:
+        plt.savefig("group_chat_acitivity_by_time.png", dpi=400)
+        plt.close()
+    else:
+        print("\nError: Wrong save_plot value! Should be 0 or 1 see help() of function!")  
+
+
 def main():
+
+    """ Main function """
+
     rcd = read_data(path_to_chat_file)
-    cm, ns = format_data(rcd, "<name>")
-    count_messages_and_words_by_name(cm, ns, 0)
+    cm, _ = format_data(rcd, "<name1>", "<name2>")
+    # count_messages_and_words_by_name(cm, ns, 0)
+    show_activity_by_time(cm, 0, 3)
 
 
 if __name__ == "__main__":
