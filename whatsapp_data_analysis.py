@@ -117,7 +117,6 @@ def count_messages_and_words_by_name(chat_messages, name_set, save_plot=0):
     for name in counter_messages_dict.keys():
         print("Number messages %s:\t%d\tnumber words:\t%d" % (name, counter_messages_dict[name], counter_words_dict[name]))
     
-
     # Plot number of messages by sender
     plt.bar(counter_messages_dict.keys(), counter_words_dict.values(), label="Messages")
     plt.bar(counter_messages_dict.keys(), counter_messages_dict.values(), label="Words")
