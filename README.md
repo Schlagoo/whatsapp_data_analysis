@@ -1,5 +1,7 @@
 # Project: Whatsapp Data Analysis 
 
+![Preview](./preview_small.png)
+
 This repository contains functions written in python to analyse a whatsapp group chat.
 
 ## Getting Started
